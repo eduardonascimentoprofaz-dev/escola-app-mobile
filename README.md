@@ -5,7 +5,7 @@ Um aplicativo web elegante e responsivo para gestão escolar de notas, otimizado
 **Versão:** 1.0.0  
 **Tecnologia:** React 19 + TypeScript + Express + tRPC + MySQL  
 **Status:** ✅ Produção  
-**Domínio:** [escolaapp-x5ndie34.manus.space](https://escolaapp-x5ndie34.manus.space)
+
 
 ---
 
