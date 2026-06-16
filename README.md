@@ -434,20 +434,6 @@ pnpm drizzle-kit migrate   # Aplica migrations
 
 ---
 
-## 🚀 Deploy
-
-### Publicar no Manus
-
-1. Clique no botão **"Publish"** na Management UI
-2. Aguarde o build (2-5 minutos)
-3. Acesse o domínio gerado: `escolaapp-x5ndie34.manus.space`
-
-### Domínios Personalizados
-1. Vá para **Settings → Domains**
-2. Clique em **"Add Custom Domain"**
-3. Configure DNS conforme instruções
-4. Domínio ativo em até 24 horas
-
 ---
 
 ## 📝 Changelog
@@ -473,35 +459,11 @@ pnpm drizzle-kit migrate   # Aplica migrations
 
 ---
 
-## 📞 Suporte
-
-### Dúvidas Frequentes
-
-**P: Como resetar a senha?**  
-R: Use a opção "Esqueceu a senha?" na tela de login do Manus
-
-**P: Posso deletar um aluno?**  
-R: Atualmente, não há função de deleção. Você pode criar uma nova turma sem o aluno
-
-**P: Quantos alunos posso cadastrar?**  
-R: Sem limite técnico. O sistema suporta milhares de alunos
-
-**P: Posso editar turmas após criação?**  
-R: Atualmente, não há função de edição. Crie uma nova turma se necessário
-
-**P: Os dados são sincronizados em tempo real?**  
-R: Sim, todos os dados são salvos imediatamente no banco de dados
-
-### Contato
-- 📧 Email: [suporte@manus.im](mailto:suporte@manus.im)
-- 🌐 Website: [manus.im](https://manus.im)
-- 💬 Chat: Disponível na Management UI
-
 ---
 
 ## 📄 Licença
 
-Este projeto é desenvolvido na plataforma Manus e segue os termos de serviço da Manus.
+Este projeto é desenvolvido na plataforma Manus com os codigos de Eduardo nascimento.
 
 ---
 
