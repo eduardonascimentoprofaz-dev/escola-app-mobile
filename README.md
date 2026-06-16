@@ -71,6 +71,7 @@ Um aplicativo web elegante e responsivo para gestão escolar de notas, otimizado
 | **Frontend** | React 19, TypeScript, Tailwind CSS 4, shadcn/ui |
 | **Backend** | Express 4, Node.js, tRPC 11 |
 | **Banco de Dados** | MySQL/TiDB, Drizzle ORM |
+| **Criação** | Eduardo Nascimento |
 | **Autenticação** | Manus OAuth |
 | **UI Components** | shadcn/ui, Lucide Icons |
 | **Notificações** | Sonner (Toast) |
