@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
+import { importRouter } from "./routers/import";
 import { z } from "zod";
 import * as db from "./db";
 
@@ -153,6 +154,9 @@ export const appRouter = router({
         return await db.getNotaByAlunoMateriaAndBimestre(input.alunoId, input.materiaId, input.bimestre);
       }),
   }),
+
+  // ========== IMPORTACAO ==========
+  import: importRouter,
 });
 
 export type AppRouter = typeof appRouter;
