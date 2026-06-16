@@ -73,3 +73,12 @@
 - [x] Implementar importação em lote para banco de dados
 - [x] Adicionar feedback visual e tratamento de erros
 - [x] Testar importação com arquivo de exemplo
+
+
+## Fase 8: Geração de APK para Android (NOVO)
+- [x] Instalar e configurar Capacitor
+- [x] Configurar metadados do aplicativo Android
+- [x] Criar scripts de build para APK
+- [x] Criar scripts de assinatura para distribuição
+- [x] Criar documentação completa de compilação
+- [x] Criar guia rápido de instalação
