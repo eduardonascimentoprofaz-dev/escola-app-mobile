@@ -23,12 +23,15 @@ export default function AlunosListaPage() {
     const fetchAllNotas = async () => {
       if (!alunosQuery.data) return;
       const map: Record<number, any[]> = {};
+      const utils = trpc.useUtils();
       
       for (const aluno of alunosQuery.data) {
         try {
-          const notas = await (trpc.notas.getByAluno as any)(aluno.id);
-          map[aluno.id] = notas;
+          // Usar fetch via utils em vez de invocar hook diretamente
+          const notas = await utils.notas.getByAluno.fetch(aluno.id);
+          map[aluno.id] = Array.isArray(notas) ? notas : [];
         } catch (error) {
+          console.error(`Erro ao buscar notas do aluno ${aluno.id}:`, error);
           map[aluno.id] = [];
         }
       }
@@ -37,7 +40,7 @@ export default function AlunosListaPage() {
     };
 
     fetchAllNotas();
-  }, [alunosQuery.data]);
+  }, [alunosQuery.data, trpc])
 
   // Calcular média final por aluno
   const alunosComMedia = useMemo(() => {
