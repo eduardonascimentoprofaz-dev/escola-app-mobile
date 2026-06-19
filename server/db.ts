@@ -269,3 +269,26 @@ export async function getNotaByAlunoMateriaAndBimestre(alunoId: number, materiaI
 
   return result[0];
 }
+
+
+export async function getNotasByTurmaAndBimestre(turmaId: number, bimestre: number): Promise<Nota[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { and, eq } = await import("drizzle-orm");
+  
+  // Buscar todos os alunos da turma
+  const alunosDaTurma = await db.select().from(alunos).where(eq(alunos.turmaId, turmaId));
+  const alunoIds = alunosDaTurma.map(a => a.id);
+
+  if (alunoIds.length === 0) return [];
+
+  // Buscar todas as notas desses alunos no bimestre
+  const { inArray } = await import("drizzle-orm");
+  return await db.select().from(notas).where(
+    and(
+      inArray(notas.alunoId, alunoIds),
+      eq(notas.bimestre, bimestre)
+    )
+  );
+}

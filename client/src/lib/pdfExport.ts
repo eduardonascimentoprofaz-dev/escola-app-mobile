@@ -423,6 +423,56 @@ export async function exportarNotasPorBimestre(
     }
   });
 
+  // Resumo de Desempenho Consolidado
+  yPosition += 8;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(25, 103, 210);
+  doc.text('RESUMO DE DESEMPENHO', 15, yPosition);
+
+  yPosition += 7;
+
+  // Calcular estatísticas
+  const alunosComNotas = alunos.filter((aluno) => {
+    const notas = notasMap[aluno.id] || [];
+    return notas.length > 0;
+  });
+
+  const mediasAlunos = alunosComNotas.map((aluno) => {
+    const notas = notasMap[aluno.id] || [];
+    const medias = notas.map((n) => parseFloat(n.media.toString())).filter((m) => m > 0);
+    return medias.length > 0 ? medias.reduce((a, b) => a + b, 0) / medias.length : 0;
+  });
+
+  const aprovados = mediasAlunos.filter((m) => m >= 6).length;
+  const reprovados = mediasAlunos.filter((m) => m > 0 && m < 6).length;
+  const mediaGeral = mediasAlunos.length > 0 ? mediasAlunos.reduce((a, b) => a + b, 0) / mediasAlunos.length : 0;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(50, 50, 50);
+
+  doc.text(`Total de Alunos: ${alunos.length}`, 15, yPosition);
+  yPosition += 5;
+
+  doc.setTextColor(34, 197, 94);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Aprovados (≥6.0): ${aprovados}`, 15, yPosition);
+  yPosition += 5;
+
+  doc.setTextColor(220, 38, 38);
+  doc.text(`Reprovados (<6.0): ${reprovados}`, 15, yPosition);
+  yPosition += 5;
+
+  doc.setTextColor(50, 50, 50);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Sem Notas: ${alunos.length - alunosComNotas.length}`, 15, yPosition);
+  yPosition += 5;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(25, 103, 210);
+  doc.text(`Média Geral da Turma: ${mediaGeral.toFixed(2)}`, 15, yPosition);
+
   // Rodapé
   doc.setTextColor(150, 150, 150);
   doc.setFontSize(8);

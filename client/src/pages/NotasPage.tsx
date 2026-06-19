@@ -250,24 +250,36 @@ export default function NotasPage() {
                 </Select>
               </div>
               <Button
-                onClick={() => {
+                onClick={async () => {
                   const turma = turmasQuery.data?.find((t) => t.id === selectedTurmaId);
                   
-                  if (turma && alunosQuery.data) {
-                    // Construir mapa de notas
-                    const notasMap: Record<number, any[]> = {};
-                    alunosQuery.data.forEach((aluno) => {
-                      notasMap[aluno.id] = [];
-                    });
-                    
-                    exportarNotasPorBimestre(
-                      turma,
-                      selectedBimestreExport,
-                      alunosQuery.data,
-                      materiasQuery.data || [],
-                      notasMap
-                    );
-                    toast.success(`Relatório do ${selectedBimestreExport}º bimestre exportado com sucesso!`);
+                  if (turma && selectedTurmaId && alunosQuery.data) {
+                    try {
+                      // Buscar notas reais da turma
+                      const utils = trpc.useUtils();
+                      const notasReais = await utils.notas.getByTurmaAndBimestre.fetch({
+                        turmaId: selectedTurmaId,
+                        bimestre: selectedBimestreExport,
+                      });
+                      
+                      // Construir mapa de notas
+                      const notasMap: Record<number, any[]> = {};
+                      alunosQuery.data.forEach((aluno) => {
+                        notasMap[aluno.id] = notasReais.filter((nota: any) => nota.alunoId === aluno.id);
+                      });
+                      
+                      exportarNotasPorBimestre(
+                        turma,
+                        selectedBimestreExport,
+                        alunosQuery.data,
+                        materiasQuery.data || [],
+                        notasMap
+                      );
+                      toast.success(`Relatório do ${selectedBimestreExport}º bimestre exportado com sucesso!`);
+                    } catch (error) {
+                      toast.error('Erro ao exportar relatório');
+                      console.error(error);
+                    }
                   }
                 }}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 w-full sm:w-auto"

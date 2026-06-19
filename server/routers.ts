@@ -153,6 +153,15 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await db.getNotaByAlunoMateriaAndBimestre(input.alunoId, input.materiaId, input.bimestre);
       }),
+
+    getByTurmaAndBimestre: protectedProcedure
+      .input(z.object({
+        turmaId: z.number().int().positive(),
+        bimestre: z.number().int().min(1).max(4),
+      }))
+      .query(async ({ input }) => {
+        return await db.getNotasByTurmaAndBimestre(input.turmaId, input.bimestre);
+      }),
   }),
 
   // ========== IMPORTACAO ==========

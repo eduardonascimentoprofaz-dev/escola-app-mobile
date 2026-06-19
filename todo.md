@@ -98,3 +98,9 @@
 - [x] Adicionar interface de seleção de bimestre
 - [x] Implementar botão de exportação por bimestre
 - [x] Testar funcionalidade de exportação consolidada
+
+## Fase 11: Correção de Exportação (NOVO)
+- [x] Criar endpoint tRPC para buscar notas de turma por bimestre
+- [x] Corrigir função de exportação para incluir notas reais
+- [x] Adicionar resumo de desempenho consolidado ao PDF
+- [x] Testar exportação com dados reais
