@@ -91,3 +91,10 @@
 - [x] Criar funcionalidade de exportação de relatório de turma em PDF
 - [x] Adicionar botão de download nas páginas de notas
 - [x] Testar exportação e download de PDFs
+
+
+## Fase 10: Exportação por Bimestre (NOVO)
+- [x] Criar função de exportação por bimestre em PDF
+- [x] Adicionar interface de seleção de bimestre
+- [x] Implementar botão de exportação por bimestre
+- [x] Testar funcionalidade de exportação consolidada

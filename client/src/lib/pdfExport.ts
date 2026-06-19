@@ -290,3 +290,150 @@ export async function exportarRelatoriTurma(
   const nomeArquivo = `Relatorio_${turma.nome.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`;
   doc.save(nomeArquivo);
 }
+
+
+/**
+ * Exportar notas por bimestre em PDF (consolidado de todos os alunos)
+ */
+export async function exportarNotasPorBimestre(
+  turma: TurmaData,
+  bimestre: number,
+  alunos: AlunoData[],
+  materias: MateriaData[],
+  notasMap: Record<number, NotaData[]>
+) {
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  let yPosition = 15;
+
+  // Header
+  doc.setFillColor(25, 103, 210);
+  doc.rect(0, 0, pageWidth, 35, 'F');
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('NOTAS POR BIMESTRE', pageWidth / 2, 12, { align: 'center' });
+
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${bimestre}º Bimestre - ${turma.nome}`, pageWidth / 2, 22, { align: 'center' });
+
+  yPosition = 42;
+
+  // Informações da turma
+  doc.setTextColor(50, 50, 50);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Turma: ${turma.turma} | Período: ${turma.periodo} | Ano: ${turma.anoEscolar}`, 15, yPosition);
+
+  yPosition += 8;
+
+  // Tabela de notas por matéria
+  const colWidth = (pageWidth - 30) / (materias.length + 1);
+  doc.setFillColor(25, 103, 210);
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+
+  // Cabeçalho: Aluno + Matérias
+  let xPos = 15;
+  doc.text('Aluno', xPos + colWidth / 2, yPosition, { align: 'center' });
+  xPos += colWidth;
+
+  materias.forEach((materia) => {
+    doc.text(materia.nome.substring(0, 10), xPos + colWidth / 2, yPosition, { align: 'center' });
+    xPos += colWidth;
+  });
+
+  yPosition += 6;
+
+  // Dados dos alunos
+  doc.setTextColor(50, 50, 50);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+
+  alunos.forEach((aluno, index) => {
+    // Alternância de cores
+    if (index % 2 === 0) {
+      doc.setFillColor(240, 240, 240);
+      doc.rect(15, yPosition - 4, pageWidth - 30, 5, 'F');
+    }
+
+    xPos = 15;
+    doc.text(`${aluno.numero} - ${aluno.nome.substring(0, 15)}`, xPos + colWidth / 2, yPosition, { align: 'center' });
+    xPos += colWidth;
+
+    // Notas por matéria
+    materias.forEach((materia) => {
+      const notas = notasMap[aluno.id] || [];
+      const nota = notas.find((n) => n.materiaId === materia.id && n.bimestre === bimestre);
+      const media = nota ? parseFloat(nota.media.toString()) : 0;
+      const corMedia = media >= 6 ? [34, 197, 94] : media > 0 ? [220, 38, 38] : [200, 200, 200];
+
+      doc.setTextColor(corMedia[0], corMedia[1], corMedia[2]);
+      doc.setFont('helvetica', 'bold');
+      doc.text(media > 0 ? media.toFixed(1) : '-', xPos + colWidth / 2, yPosition, { align: 'center' });
+      doc.setTextColor(50, 50, 50);
+      doc.setFont('helvetica', 'normal');
+
+      xPos += colWidth;
+    });
+
+    yPosition += 5;
+
+    // Quebra de página se necessário
+    if (yPosition > pageHeight - 20) {
+      doc.addPage();
+      yPosition = 15;
+    }
+  });
+
+  yPosition += 5;
+
+  // Resumo por matéria
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('MÉDIA POR MATÉRIA', 15, yPosition);
+
+  yPosition += 6;
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+
+  materias.forEach((materia) => {
+    const notasMateria = Object.values(notasMap)
+      .flat()
+      .filter((n) => n.materiaId === materia.id && n.bimestre === bimestre);
+
+    if (notasMateria.length > 0) {
+      const medias = notasMateria.map((n) => parseFloat(n.media.toString())).filter((m) => m > 0);
+      const mediaMateria = medias.length > 0 ? medias.reduce((a, b) => a + b, 0) / medias.length : 0;
+      const corMedia = mediaMateria >= 6 ? [34, 197, 94] : [220, 38, 38];
+
+      doc.text(`${materia.nome}:`, 15, yPosition);
+      doc.setTextColor(corMedia[0], corMedia[1], corMedia[2]);
+      doc.setFont('helvetica', 'bold');
+      doc.text(mediaMateria.toFixed(2), 100, yPosition);
+      doc.setTextColor(50, 50, 50);
+      doc.setFont('helvetica', 'normal');
+
+      yPosition += 5;
+    }
+  });
+
+  // Rodapé
+  doc.setTextColor(150, 150, 150);
+  doc.setFontSize(8);
+  doc.text(
+    `Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`,
+    pageWidth / 2,
+    pageHeight - 10,
+    { align: 'center' }
+  );
+
+  // Salvar PDF
+  const nomeArquivo = `Notas_${bimestre}Bimestre_${turma.nome.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`;
+  doc.save(nomeArquivo);
+}

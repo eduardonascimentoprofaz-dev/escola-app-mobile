@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Save, AlertCircle, Download } from "lucide-react";
-import { exportarBoletimAluno } from "@/lib/pdfExport";
+import { exportarBoletimAluno, exportarNotasPorBimestre } from "@/lib/pdfExport";
 
 interface NotaFormData {
   alunoId: number;
@@ -35,7 +35,9 @@ export default function NotasPage() {
   const [selectedTurmaId, setSelectedTurmaId] = useState<number | null>(null);
   const [selectedAlunoId, setSelectedAlunoId] = useState<number | null>(null);
   const [selectedBimestre, setSelectedBimestre] = useState<number>(1);
+  const [selectedBimestreExport, setSelectedBimestreExport] = useState<number>(1);
   const [notasForm, setNotasForm] = useState<Record<number, NotaFormData>>({});
+  const [notasTurmaMap, setNotasTurmaMap] = useState<Record<number, any[]>>({});
 
   const turmasQuery = trpc.turmas.list.useQuery();
   const alunosQuery = trpc.alunos.listByTurma.useQuery(selectedTurmaId || 0, {
@@ -223,6 +225,60 @@ export default function NotasPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Exportação por Bimestre */}
+      {selectedTurmaId && (
+        <Card className="bg-white shadow-md border-0">
+          <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <CardTitle className="text-indigo-900">Exportar Notas por Bimestre</CardTitle>
+            <CardDescription>Gere um relatório consolidado de todas as notas da turma para um bimestre específico</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-end">
+              <div className="flex-1">
+                <Label htmlFor="bimestreExportSelect">Selecione o Bimestre</Label>
+                <Select value={selectedBimestreExport.toString()} onValueChange={(value) => setSelectedBimestreExport(parseInt(value))}>
+                  <SelectTrigger id="bimestreExportSelect">
+                    <SelectValue placeholder="Selecione o bimestre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1º Bimestre</SelectItem>
+                    <SelectItem value="2">2º Bimestre</SelectItem>
+                    <SelectItem value="3">3º Bimestre</SelectItem>
+                    <SelectItem value="4">4º Bimestre</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                onClick={() => {
+                  const turma = turmasQuery.data?.find((t) => t.id === selectedTurmaId);
+                  
+                  if (turma && alunosQuery.data) {
+                    // Construir mapa de notas
+                    const notasMap: Record<number, any[]> = {};
+                    alunosQuery.data.forEach((aluno) => {
+                      notasMap[aluno.id] = [];
+                    });
+                    
+                    exportarNotasPorBimestre(
+                      turma,
+                      selectedBimestreExport,
+                      alunosQuery.data,
+                      materiasQuery.data || [],
+                      notasMap
+                    );
+                    toast.success(`Relatório do ${selectedBimestreExport}º bimestre exportado com sucesso!`);
+                  }
+                }}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 w-full sm:w-auto"
+              >
+                <Download className="w-4 h-4" />
+                Exportar Bimestre
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Grade de Notas */}
       {selectedAlunoId && (
