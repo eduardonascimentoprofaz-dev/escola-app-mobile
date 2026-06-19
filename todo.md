@@ -82,3 +82,12 @@
 - [x] Criar scripts de assinatura para distribuição
 - [x] Criar documentação completa de compilação
 - [x] Criar guia rápido de instalação
+
+
+## Fase 9: Logo e Exportação em PDF (NOVO)
+- [x] Upload da logo profissional do Escola App Mobile
+- [x] Integrar logo no header e telas de login
+- [x] Criar funcionalidade de exportação de boletim em PDF
+- [x] Criar funcionalidade de exportação de relatório de turma em PDF
+- [x] Adicionar botão de download nas páginas de notas
+- [x] Testar exportação e download de PDFs

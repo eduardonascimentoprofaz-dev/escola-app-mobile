@@ -29,9 +29,9 @@ export default function Home() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
         <div className="text-center max-w-md">
           <div className="mb-8">
-            <GraduationCap className="w-16 h-16 mx-auto text-indigo-600 mb-4" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Escola App</h1>
-            <p className="text-gray-600">Gestão elegante de notas escolares</p>
+            <img src="/manus-storage/ChatGPTImage16dejun.de2026,09_10_08_f9961c86.png" alt="Escola App Logo" className="h-32 w-32 mx-auto mb-6 object-contain" />
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Escola App Mobile</h1>
+            <p className="text-gray-600 font-semibold">Gestão Escolar de Notas</p>
           </div>
           <p className="text-gray-700 mb-6">
             Cadastre alunos, turmas e matérias. Acompanhe notas e desempenho com indicadores visuais intuitivos.
@@ -54,8 +54,11 @@ export default function Home() {
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <GraduationCap className="w-8 h-8 text-indigo-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Escola App</h1>
+            <img src="/manus-storage/ChatGPTImage16dejun.de2026,09_10_08_f9961c86.png" alt="Escola App Logo" className="h-12 w-12 object-contain" />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Escola App</h1>
+              <p className="text-xs text-gray-500">Gestão Escolar de Notas</p>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">Bem-vindo, <span className="font-semibold">{user?.name || "Usuário"}</span></span>

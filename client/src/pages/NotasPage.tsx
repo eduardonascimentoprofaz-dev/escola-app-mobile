@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Save, AlertCircle } from "lucide-react";
+import { Save, AlertCircle, Download } from "lucide-react";
+import { exportarBoletimAluno } from "@/lib/pdfExport";
 
 interface NotaFormData {
   alunoId: number;
@@ -15,6 +16,19 @@ interface NotaFormData {
   n1: string;
   n2: string;
   n3: string;
+}
+
+interface NotaDataFromAPI {
+  id: number;
+  alunoId: number;
+  materiaId: number;
+  bimestre: number;
+  n1: string | null;
+  n2: string | null;
+  n3: string | null;
+  media: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export default function NotasPage() {
@@ -323,32 +337,59 @@ export default function NotasPage() {
 
                 {/* Média Final */}
                 {mediaFinal !== null && (
-                  <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg border-2 border-indigo-200">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-gray-900 text-lg">Média Final</span>
-                      <div className="flex items-center gap-3">
-                        <span className={`text-2xl font-bold px-4 py-2 rounded-lg ${
-                          mediaFinal >= 6
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}>
-                          {mediaFinal.toFixed(2)}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          {mediaFinal >= 6 ? (
-                            <div className="text-green-600">
-                              <div className="text-2xl">✓</div>
-                              <p className="text-xs font-semibold">Aprovado</p>
-                            </div>
-                          ) : (
-                            <div className="text-red-600">
-                              <AlertCircle className="w-6 h-6" />
-                              <p className="text-xs font-semibold">Reprovado</p>
-                            </div>
-                          )}
+                  <div className="mt-4 space-y-4">
+                    <div className="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg border-2 border-indigo-200">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-gray-900 text-lg">Média Final</span>
+                        <div className="flex items-center gap-3">
+                          <span className={`text-2xl font-bold px-4 py-2 rounded-lg ${
+                            mediaFinal >= 6
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}>
+                            {mediaFinal.toFixed(2)}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            {mediaFinal >= 6 ? (
+                              <div className="text-green-600">
+                                <div className="text-2xl">✓</div>
+                                <p className="text-xs font-semibold">Aprovado</p>
+                              </div>
+                            ) : (
+                              <div className="text-red-600">
+                                <AlertCircle className="w-6 h-6" />
+                                <p className="text-xs font-semibold">Reprovado</p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
+                    
+                    {/* Botão de Exportação */}
+                    {selectedAlunoId && alunosQuery.data && notasQuery.data && (
+                      <Button
+                        onClick={() => {
+                          const aluno = alunosQuery.data?.find((a) => a.id === selectedAlunoId);
+                          const turma = turmasQuery.data?.find((t) => t.id === selectedTurmaId);
+                          if (aluno && turma) {
+                            const notasFormatadas = (notasQuery.data || []).map((n: any) => ({
+                              ...n,
+                              n1: n.n1 || 0,
+                              n2: n.n2 || 0,
+                              n3: n.n3 || 0,
+                              media: n.media || 0,
+                            }));
+                            exportarBoletimAluno(aluno, turma, materiasQuery.data || [], notasFormatadas);
+                            toast.success("Boletim exportado com sucesso!");
+                          }
+                        }}
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        Exportar Boletim em PDF
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
