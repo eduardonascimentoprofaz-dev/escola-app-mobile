@@ -343,7 +343,7 @@ export async function exportarNotasPorBimestre(
   xPos += colWidth;
 
   materias.forEach((materia) => {
-    doc.text(materia.nome.substring(0, 10), xPos + colWidth / 2, yPosition, { align: 'center' });
+    doc.text(materia.nome, xPos + colWidth / 2, yPosition, { align: 'center' });
     xPos += colWidth;
   });
 
@@ -391,37 +391,6 @@ export async function exportarNotasPorBimestre(
   });
 
   yPosition += 5;
-
-  // Resumo por matéria
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.text('MÉDIA POR MATÉRIA', 15, yPosition);
-
-  yPosition += 6;
-
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-
-  materias.forEach((materia) => {
-    const notasMateria = Object.values(notasMap)
-      .flat()
-      .filter((n) => n.materiaId === materia.id && n.bimestre === bimestre);
-
-    if (notasMateria.length > 0) {
-      const medias = notasMateria.map((n) => parseFloat(n.media.toString())).filter((m) => m > 0);
-      const mediaMateria = medias.length > 0 ? medias.reduce((a, b) => a + b, 0) / medias.length : 0;
-      const corMedia = mediaMateria >= 6 ? [34, 197, 94] : [220, 38, 38];
-
-      doc.text(`${materia.nome}:`, 15, yPosition);
-      doc.setTextColor(corMedia[0], corMedia[1], corMedia[2]);
-      doc.setFont('helvetica', 'bold');
-      doc.text(mediaMateria.toFixed(2), 100, yPosition);
-      doc.setTextColor(50, 50, 50);
-      doc.setFont('helvetica', 'normal');
-
-      yPosition += 5;
-    }
-  });
 
   // Resumo de Desempenho Consolidado
   yPosition += 8;
