@@ -332,7 +332,11 @@ export async function exportarNotasPorBimestre(
 
   // Tabela de notas por matéria
   const colWidth = (pageWidth - 30) / (materias.length + 1);
+  
+  // Desenhar fundo do cabeçalho
   doc.setFillColor(25, 103, 210);
+  doc.rect(15, yPosition - 4, pageWidth - 30, 6, 'F');
+  
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
@@ -343,11 +347,12 @@ export async function exportarNotasPorBimestre(
   xPos += colWidth;
 
   materias.forEach((materia) => {
-    doc.text(materia.nome, xPos + colWidth / 2, yPosition, { align: 'center' });
+    const nomeMateria = materia.nome.length > 15 ? materia.nome.substring(0, 12) + '.' : materia.nome;
+    doc.text(nomeMateria, xPos + colWidth / 2, yPosition, { align: 'center' });
     xPos += colWidth;
   });
 
-  yPosition += 6;
+  yPosition += 7;
 
   // Dados dos alunos
   doc.setTextColor(50, 50, 50);
