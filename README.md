@@ -1,11 +1,11 @@
-# 📚 Escola App Mobile - Gestão Escolar de Notas
+# Escola App Mobile - Gestão Escolar de Notas
 
-Um aplicativo web elegante e responsivo para gestão escolar de notas, otimizado para uso em dispositivos móveis Android. Permite cadastro de alunos, turmas, matérias, registro de notas por bimestre e acompanhamento visual do desempenho dos alunos.
+Um aplicativo web elegante e responsivo para gestão escolar de notas, otimizado para uso em dispositivos móveis Android. Permite cadastro de alunos, turmas, matérias, registro de notas por bimestre, acompanhamento visual do desempenho e exportação de relatórios em PDF.
 
-**Versão:** 1.0.0  
-**Tecnologia:** React 19 + TypeScript + Express + tRPC + MySQL  
+**Versão:** 2.0.0  
+**Tecnologia:** React 19 + TypeScript + Express + tRPC + MySQL + jsPDF + Capacitor  
 **Status:** ✅ Produção  
-
+**Domínio:** https://escolaapp-x5ndie34.manus.space
 
 ---
 
@@ -23,6 +23,7 @@ Um aplicativo web elegante e responsivo para gestão escolar de notas, otimizado
 - Listar alunos por turma
 - Buscar alunos por nome ou número
 - Visualizar status de aprovação de cada aluno
+- Exibição de média final por aluno
 
 ### 3. **Gestão de Matérias**
 - Cadastrar matérias escolares (Português, Matemática, História, etc.)
@@ -60,6 +61,28 @@ Um aplicativo web elegante e responsivo para gestão escolar de notas, otimizado
 - Tratamento detalhado de erros com listagem de problemas
 - Preview de dados antes da importação
 
+### 7. **Exportação de Relatórios em PDF**
+- **Boletim Individual**: Exportar notas de um aluno com média final e indicador visual
+- **Relatório por Bimestre**: Exportar todas as notas de uma turma em um bimestre específico
+  - Tabela consolidada com todos os alunos
+  - Nomes das matérias no cabeçalho
+  - Médias por matéria com indicadores visuais
+  - Resumo de desempenho consolidado (aprovados, reprovados, média geral)
+- Design profissional com logo do Escola App Mobile
+- Quebra de página automática para relatórios longos
+
+### 8. **Logo e Identidade Visual**
+- Logo profissional do Escola App Mobile integrada
+- Exibição no header e telas de login
+- Design elegante e sofisticado
+- Cores coordenadas (azul principal #1967D2)
+
+### 9. **Autenticação e Segurança**
+- Autenticação via Manus OAuth
+- Controle de acesso por usuário
+- Sessões seguras com cookies
+- Logout com limpeza de sessão
+
 ---
 
 ## 🏗️ Arquitetura do Sistema
@@ -71,11 +94,12 @@ Um aplicativo web elegante e responsivo para gestão escolar de notas, otimizado
 | **Frontend** | React 19, TypeScript, Tailwind CSS 4, shadcn/ui |
 | **Backend** | Express 4, Node.js, tRPC 11 |
 | **Banco de Dados** | MySQL/TiDB, Drizzle ORM |
-| **Criação** | Eduardo Nascimento |
 | **Autenticação** | Manus OAuth |
 | **UI Components** | shadcn/ui, Lucide Icons |
 | **Notificações** | Sonner (Toast) |
 | **Importação** | XLSX (xlsx library) |
+| **Exportação** | jsPDF |
+| **Mobile** | Capacitor (React Native Bridge) |
 
 ### Estrutura de Banco de Dados
 
@@ -98,31 +122,31 @@ turmas
 ├── periodo
 └── timestamps
 
--- Alunos (estudantes)
+-- Alunos
 alunos
 ├── id (PK)
-├── numero (número do aluno)
+├── turmaId (FK)
+├── numero (ex: 1, 2, 3...)
 ├── nome
-├── turmaId (FK → turmas)
 └── timestamps
 
--- Matérias (disciplinas)
+-- Matérias
 materias
 ├── id (PK)
-├── nome
+├── nome (ex: "Português", "Matemática")
 ├── codigo (opcional)
 └── timestamps
 
--- Notas (grades por bimestre)
+-- Notas
 notas
 ├── id (PK)
-├── alunoId (FK → alunos)
-├── materiaId (FK → materias)
+├── alunoId (FK)
+├── materiaId (FK)
 ├── bimestre (1-4)
-├── n1 (nota 1)
-├── n2 (nota 2)
-├── n3 (nota 3)
-├── media (calculada automaticamente)
+├── n1 (decimal)
+├── n2 (decimal)
+├── n3 (decimal)
+├── media (calculada)
 └── timestamps
 ```
 
@@ -133,197 +157,223 @@ Frontend (React)
     ↓
 tRPC Client
     ↓
-Backend (Express + tRPC)
+tRPC Server (Express)
     ↓
-Database (MySQL)
+Drizzle ORM
     ↓
-Response → Frontend
+MySQL Database
 ```
 
 ---
 
-## 🚀 Como Usar
+## 📱 Guia de Uso
 
-### Acesso ao Aplicativo
+### Primeira Vez
 
-1. Abra o navegador e acesse: **[escolaapp-x5ndie34.manus.space](https://escolaapp-x5ndie34.manus.space)**
-2. Faça login com sua conta Manus
-3. Você será redirecionado para a página inicial
+1. **Faça login** com sua conta Manus OAuth
+2. **Crie uma turma**: Vá para a aba "Turmas" e clique em "Criar Turma"
+3. **Crie matérias**: Vá para a aba "Matérias" e adicione as disciplinas
+4. **Cadastre alunos**: Vá para a aba "Alunos" e adicione os alunos à turma
 
-### Fluxo de Uso Recomendado
+### Registrando Notas
 
-#### **Passo 1: Criar Turmas**
-1. Clique na aba **"Turmas"**
-2. Preencha os campos:
-   - **Ano Escolar**: ex: "5º Ano"
-   - **Turma**: ex: "A"
-   - **Período**: "Manhã" ou "Tarde"
-3. Clique em **"Criar Turma"**
-4. A turma aparecerá na lista abaixo
+1. Vá para a aba "Notas"
+2. Selecione a turma, aluno e bimestre
+3. Preencha as notas N1, N2 e N3 para cada matéria
+4. A média é calculada automaticamente
+5. Clique em "Salvar Notas"
 
-#### **Passo 2: Cadastrar Matérias**
-1. Clique na aba **"Matérias"**
-2. Clique em **"Adicionar Matéria"** (ou use as sugestões pré-preenchidas)
-3. Digite o nome da matéria (ex: "Português", "Matemática")
-4. Clique em **"Criar Matéria"**
+### Importando Dados em Lote
 
-#### **Passo 3: Adicionar Alunos**
-1. Clique na aba **"Alunos"**
-2. Selecione a turma no dropdown
-3. Preencha:
-   - **Número do Aluno**: número sequencial (1, 2, 3...)
-   - **Nome do Aluno**: nome completo
-4. Clique em **"Adicionar Aluno"**
-5. Alunos aparecem na lista abaixo
+1. Vá para a aba "Importação"
+2. Selecione a aba "Importar Alunos" ou "Importar Notas"
+3. Faça upload do arquivo XLSX
+4. Revise o preview dos dados
+5. Clique em "Importar" para confirmar
 
-#### **Passo 4: Registrar Notas**
-1. Clique na aba **"Notas"**
-2. Selecione:
-   - **Turma**: escolha a turma
-   - **Aluno**: escolha o aluno
-   - **Bimestre**: 1º, 2º, 3º ou 4º
-3. Para cada matéria, preencha N1, N2 e N3
-4. Clique em **"Salvar Notas"**
-5. A média é calculada automaticamente
-6. Visualize o status visual (verde/vermelho) na seção "Resumo de Desempenho"
+### Exportando Relatórios
 
-#### **Passo 5: Visualizar Desempenho**
-1. Clique na aba **"Alunos"** (Listagem)
-2. Selecione a turma
-3. Visualize:
-   - Status de aprovação (verde/vermelho)
-   - Média final de cada aluno
-   - Estatísticas da turma
-
-#### **Passo 6: Importar Dados (Opcional)**
-1. Clique na aba **"Importação"**
-2. Escolha entre **"Importar Alunos"** ou **"Importar Notas"**
-3. Selecione a turma
-4. Clique em **"Selecionar Arquivo"** e escolha um XLSX
-5. Clique em **"Importar"**
-6. Visualize o resultado com quantidade importada e erros
+1. Vá para a aba "Notas"
+2. Para **boletim individual**:
+   - Selecione turma, aluno e bimestre
+   - Clique em "Exportar Boletim" na seção de média final
+3. Para **relatório por bimestre**:
+   - Selecione turma e bimestre
+   - Clique em "Exportar Bimestre" na seção de exportação
+4. O PDF será baixado automaticamente
 
 ---
 
-## 📊 Formato de Importação
+## 📊 Formatos de Importação
 
 ### Importar Alunos (XLSX)
 
-| Coluna A | Coluna B |
-|----------|----------|
-| Número | Nome |
-| 1 | João Silva |
-| 2 | Maria Santos |
-| 3 | Pedro Oliveira |
+Crie um arquivo Excel com as seguintes colunas:
 
-**Exemplo de arquivo:** `alunos.xlsx`
+| Coluna | Descrição | Exemplo |
+|--------|-----------|---------|
+| Número | Número do aluno | 1 |
+| Nome | Nome completo | Francisco Eduardo |
+| Turma | Nome da turma | 1 a |
+
+**Exemplo de arquivo:**
+```
+Número | Nome | Turma
+1 | Francisco Eduardo | 1 a
+2 | João Silva | 1 a
+3 | Maria Santos | 1 a
+```
 
 ### Importar Notas (XLSX)
 
-| A | B | C | D | E | F | G |
-|---|---|---|---|---|---|---|
-| Número Aluno | Nome Aluno | Matéria | Bimestre | N1 | N2 | N3 |
-| 1 | João Silva | Português | 1 | 8.5 | 7.0 | 8.0 |
-| 1 | João Silva | Matemática | 1 | 9.0 | 8.5 | 9.5 |
-| 2 | Maria Santos | Português | 1 | 9.5 | 9.0 | 9.5 |
+Crie um arquivo Excel com as seguintes colunas:
 
-**Exemplo de arquivo:** `notas.xlsx`
+| Coluna | Descrição | Exemplo |
+|--------|-----------|---------|
+| Aluno | Número do aluno | 1 |
+| Matéria | Nome da matéria | Português |
+| Bimestre | Número do bimestre (1-4) | 1 |
+| N1 | Primeira nota | 8.5 |
+| N2 | Segunda nota | 7.0 |
+| N3 | Terceira nota | 9.0 |
+
+**Exemplo de arquivo:**
+```
+Aluno | Matéria | Bimestre | N1 | N2 | N3
+1 | Português | 1 | 8.5 | 7.0 | 9.0
+1 | Matemática | 1 | 7.5 | 8.0 | 8.5
+2 | Português | 1 | 6.0 | 6.5 | 7.0
+```
 
 ---
 
-## 🎨 Interface e Design
+## 🎨 Design e Responsividade
 
-### Tema Visual
-- **Paleta de Cores**: Azul indigo (primário), verde (aprovação), vermelho (reprovação)
-- **Tipografia**: Inter (Google Fonts)
+### Características Visuais
+
+- **Cores Principais**: Azul (#1967D2), Verde (#22C55E), Vermelho (#DC2626)
+- **Tipografia**: Inter, Helvetica
+- **Espaçamento**: Sistema de grid com Tailwind CSS
 - **Componentes**: shadcn/ui para consistência
-- **Ícones**: Lucide React
 
 ### Responsividade
-- ✅ Otimizado para Android (viewport 375px)
-- ✅ Tablet (768px)
-- ✅ Desktop (1280px+)
-- ✅ Touch-friendly com espaçamento adequado
-- ✅ Navegação por abas em mobile
 
-### Acessibilidade
-- ✅ Contraste de cores adequado
-- ✅ Rótulos de formulário associados
-- ✅ Navegação por teclado
-- ✅ Feedback visual claro
+- ✅ Mobile-first design (otimizado para Android)
+- ✅ Tablet (768px+)
+- ✅ Desktop (1024px+)
+- ✅ Navegação adaptativa por abas
+- ✅ Toque-friendly (botões com 44px mínimo)
 
 ---
 
-## 🔐 Autenticação e Segurança
+## 🚀 Deployment e APK
 
-### Autenticação
-- **Sistema**: Manus OAuth 2.0
-- **Fluxo**: Login automático ao acessar o app
-- **Sessão**: Mantida via cookie seguro
-- **Logout**: Disponível no menu superior
+### Publicar na Web
 
-### Autorização
-- Todos os endpoints requerem autenticação
-- Usuários só veem seus próprios dados
-- Suporte para roles (admin/user) para expansão futura
+1. Clique no botão **"Publish"** na interface de gerenciamento
+2. Escolha o domínio (ex: escolaapp-x5ndie34.manus.space)
+3. Configure as configurações de visibilidade
+4. Clique em "Publicar"
 
-### Dados Sensíveis
-- Senhas: Gerenciadas pelo Manus OAuth
-- Notas: Armazenadas com criptografia em trânsito (HTTPS)
-- Banco de dados: Backups automáticos
+### Gerar APK para Android
 
----
+O projeto está configurado com **Capacitor** para gerar APK nativo.
 
-## 🛠️ Desenvolvimento
-
-### Pré-requisitos
-- Node.js 22+
-- pnpm 10+
-- Git
-
-### Instalação Local
+#### Método 1: Build Local (Recomendado)
 
 ```bash
-# Clonar repositório
-git clone <repository-url>
+# Clone o repositório
+git clone https://github.com/seu-usuario/escola-app-mobile.git
 cd escola-app-mobile
 
-# Instalar dependências
+# Instale dependências
 pnpm install
 
-# Configurar variáveis de ambiente
-cp .env.example .env
-# Editar .env com suas credenciais
+# Compile o frontend
+pnpm build
 
-# Executar em desenvolvimento
+# Execute o script de build
+./scripts/build-apk.sh debug
+
+# O APK será gerado em: android/app/build/outputs/apk/debug/
+```
+
+#### Método 2: Build em Nuvem
+
+Use serviços como:
+- **GitHub Actions** (CI/CD automatizado)
+- **EAS Build** (Expo Application Services)
+- **Codemagic** (Build mobile em nuvem)
+
+#### Método 3: APK Online
+
+Use ferramentas online como:
+- **PhoneGap Build**
+- **Appetize.io**
+- **Capacitor Cloud**
+
+### Assinar APK para Play Store
+
+```bash
+# Gere uma chave de assinatura (primeira vez)
+keytool -genkey -v -keystore my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-key-alias
+
+# Assine o APK
+./scripts/sign-apk.sh
+
+# O APK assinado estará em: android/app/build/outputs/apk/release/
+```
+
+---
+
+## 🔧 Desenvolvimento Local
+
+### Requisitos
+
+- Node.js 18+
+- pnpm 10+
+- MySQL 8+ ou TiDB
+- Java JDK 11+ (para Android)
+- Android SDK (para compilar APK)
+
+### Setup
+
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/escola-app-mobile.git
+cd escola-app-mobile
+
+# Instale dependências
+pnpm install
+
+# Configure variáveis de ambiente
+cp .env.example .env.local
+
+# Inicie o servidor de desenvolvimento
 pnpm dev
 
-# Acessar em http://localhost:3000
+# Acesse em: http://localhost:3000
 ```
 
 ### Estrutura de Pastas
 
 ```
 escola-app-mobile/
-├── client/                    # Frontend React
+├── client/                 # Frontend React
 │   ├── src/
-│   │   ├── pages/            # Páginas (Turmas, Alunos, Notas, etc)
-│   │   ├── components/       # Componentes reutilizáveis
-│   │   ├── lib/              # Utilitários (tRPC client)
-│   │   ├── contexts/         # Contextos React
-│   │   └── App.tsx           # Roteamento principal
-│   └── index.html
-├── server/                    # Backend Express
-│   ├── routers/              # Routers tRPC (turmas, alunos, etc)
-│   ├── db.ts                 # Query helpers
-│   ├── routers.ts            # Agregação de routers
-│   └── _core/                # Infraestrutura (auth, OAuth, etc)
-├── drizzle/                  # Migrations e schema
-│   ├── schema.ts             # Definição de tabelas
-│   └── migrations/           # Arquivos SQL
-├── shared/                   # Código compartilhado
-├── package.json
-└── README.md
+│   │   ├── pages/         # Páginas principais
+│   │   ├── components/    # Componentes reutilizáveis
+│   │   ├── lib/           # Utilitários (pdfExport.ts)
+│   │   └── App.tsx        # Roteamento principal
+│   └── public/            # Assets estáticos
+├── server/                # Backend Express + tRPC
+│   ├── routers.ts         # Definição de procedures
+│   ├── db.ts              # Query helpers
+│   └── _core/             # Framework interno
+├── drizzle/               # Schema do banco de dados
+├── scripts/               # Scripts de build e release
+├── android/               # Código nativo Android (Capacitor)
+└── README.md              # Este arquivo
 ```
 
 ### Comandos Úteis
@@ -333,157 +383,101 @@ escola-app-mobile/
 pnpm dev              # Inicia servidor de desenvolvimento
 
 # Build
-pnpm build            # Compila para produção
+pnpm build            # Compila frontend e backend
+pnpm check            # Verifica tipos TypeScript
 
 # Testes
 pnpm test             # Executa testes com Vitest
 
 # Linting
 pnpm format           # Formata código com Prettier
-pnpm check            # Verifica tipos TypeScript
 
 # Database
-pnpm drizzle-kit generate  # Gera migrations
+pnpm drizzle-kit generate  # Gera migrations SQL
 pnpm drizzle-kit migrate   # Aplica migrations
 ```
-
-### Adicionando Nova Funcionalidade
-
-1. **Atualizar Schema** (`drizzle/schema.ts`)
-   ```typescript
-   export const novaTabela = mysqlTable("nova_tabela", {
-     id: int("id").autoincrement().primaryKey(),
-     // ... colunas
-   });
-   ```
-
-2. **Gerar Migration**
-   ```bash
-   pnpm drizzle-kit generate
-   ```
-
-3. **Aplicar Migration**
-   ```bash
-   pnpm drizzle-kit migrate
-   ```
-
-4. **Criar Query Helper** (`server/db.ts`)
-   ```typescript
-   export async function getNovaTabela() {
-     const db = await getDb();
-     return await db.select().from(novaTabela);
-   }
-   ```
-
-5. **Criar Router tRPC** (`server/routers/nova.ts`)
-   ```typescript
-   export const novaRouter = router({
-     list: protectedProcedure.query(async () => {
-       return await db.getNovaTabela();
-     }),
-   });
-   ```
-
-6. **Integrar Router** (`server/routers.ts`)
-   ```typescript
-   export const appRouter = router({
-     nova: novaRouter,
-     // ...
-   });
-   ```
-
-7. **Criar Página React** (`client/src/pages/NovaPage.tsx`)
-   ```typescript
-   export default function NovaPage() {
-     const query = trpc.nova.list.useQuery();
-     // ...
-   }
-   ```
-
----
-
-## 📈 Métricas e Monitoramento
-
-### Dados Coletados
-- Acessos ao aplicativo (via Umami Analytics)
-- Operações CRUD (criação, leitura, atualização)
-- Erros e exceções
-
-### Dashboard
-- Disponível em: Management UI → Dashboard
-- Visualiza: Visualizações, Pageviews, Usuários únicos
-
----
-
-## 🐛 Troubleshooting
-
-### Problema: "Arquivo XLSX não é reconhecido"
-**Solução**: Certifique-se de que o arquivo está em formato `.xlsx` (não `.xls` antigo ou `.csv`)
-
-### Problema: "Aluno não encontrado durante importação"
-**Solução**: Verifique se o número ou nome do aluno corresponde exatamente aos cadastrados
-
-### Problema: "Matéria não encontrada durante importação"
-**Solução**: Certifique-se de que a matéria está cadastrada antes de importar notas
-
-### Problema: "Erro ao conectar ao banco de dados"
-**Solução**: Verifique se `DATABASE_URL` está configurado corretamente em `.env`
-
-### Problema: "Notas aparecem como 0 após importação"
-**Solução**: Certifique-se de que as colunas E, F, G (N1, N2, N3) contêm números válidos
-
----
 
 ---
 
 ## 📝 Changelog
 
-### v1.0.0 (Atual)
-- ✅ Gestão completa de turmas, alunos e matérias
-- ✅ Grade de notas com cálculo automático de média
-- ✅ Indicadores visuais de aprovação (verde/vermelho)
-- ✅ Listagem de alunos com busca e estatísticas
-- ✅ Importação de dados via XLSX
-- ✅ Interface responsiva mobile-first
-- ✅ Autenticação Manus OAuth
-- ✅ Feedback visual com toasts
+### v2.0.0 (Atual)
+- ✅ Adicionada logo profissional do Escola App Mobile
+- ✅ Implementada exportação de notas em PDF (boletim individual)
+- ✅ Implementada exportação consolidada por bimestre
+- ✅ Adicionado resumo de desempenho nos relatórios
+- ✅ Corrigido layout do PDF com cabeçalho de matérias
+- ✅ Configurado Capacitor para gerar APK Android
+- ✅ Criados scripts de build e assinatura
 
-### Roadmap Futuro
-- 🔜 Suporte a importação de PDF
-- 🔜 Gráficos de evolução de notas
-- 🔜 Relatórios em PDF por aluno
-- 🔜 Notificações de alunos com baixo desempenho
-- 🔜 Exportação de dados em Excel
-- 🔜 Modo offline com sincronização
-- 🔜 App nativa Android/iOS
+### v1.0.0
+- ✅ Gestão de turmas, alunos e matérias
+- ✅ Grade de notas com cálculo de média
+- ✅ Indicadores visuais de aprovação
+- ✅ Listagem e busca de alunos
+- ✅ Importação de dados em XLSX
+- ✅ Autenticação Manus OAuth
+- ✅ Design responsivo mobile-first
 
 ---
+
+## 🐛 Troubleshooting
+
+### Erro ao importar XLSX
+
+**Problema**: "Erro ao processar arquivo"  
+**Solução**: Verifique se o arquivo está no formato correto com as colunas esperadas
+
+### Notas não aparecem na grade
+
+**Problema**: "Sem notas registradas"  
+**Solução**: Certifique-se de que alunos e matérias foram cadastrados primeiro
+
+### PDF não gera
+
+**Problema**: "Erro ao exportar relatório"  
+**Solução**: Verifique se há dados de notas para exportar
+
+### APK não instala
+
+**Problema**: "Aplicação não instalada"  
+**Solução**: Habilite "Instalar de fontes desconhecidas" nas configurações do Android
+
+---
+
+## 📞 Suporte
+
+Para dúvidas, bugs ou sugestões:
+
+1. Abra uma **Issue** no GitHub
+2. Envie um **Pull Request** com melhorias
+3. Entre em contato via email
 
 ---
 
 ## 📄 Licença
 
-Este projeto é desenvolvido na plataforma Manus com os codigos de Eduardo nascimento.
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para detalhes.
 
 ---
 
-## 👨‍💻 Desenvolvido com
+## 👨‍💻 Autor
 
-- **React 19** - UI Library
-- **TypeScript** - Type Safety
-- **Express** - Backend Framework
-- **tRPC** - Type-safe RPC
-- **Drizzle ORM** - Database ORM
-- **Tailwind CSS** - Styling
-- **shadcn/ui** - Component Library
-- **Manus Platform** - Hosting & Infrastructure
+**Francisco Eduardo Nascimento**  
+Desenvolvido com ❤️ usando React, TypeScript e Manus Platform
 
 ---
 
 ## 🙏 Agradecimentos
 
-Desenvolvido com ❤️ para educadores e gestores escolares.
+- **Manus Platform** - Infraestrutura e autenticação
+- **shadcn/ui** - Componentes de UI
+- **Tailwind CSS** - Styling
+- **jsPDF** - Geração de PDFs
+- **Capacitor** - Bridge para Android
 
-**Versão:** 1.0.0  
-**Última atualização:** 16 de Junho de 2026  
+---
+
+**Última atualização:** Junho 2026  
+**Versão:** 2.0.0  
 **Status:** ✅ Produção
