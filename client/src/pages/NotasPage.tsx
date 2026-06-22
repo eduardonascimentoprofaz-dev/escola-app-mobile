@@ -38,6 +38,8 @@ export default function NotasPage() {
   const [selectedBimestreExport, setSelectedBimestreExport] = useState<number>(1);
   const [notasForm, setNotasForm] = useState<Record<number, NotaFormData>>({});
   const [notasTurmaMap, setNotasTurmaMap] = useState<Record<number, any[]>>({});
+  
+  const utils = trpc.useUtils();
 
   const turmasQuery = trpc.turmas.list.useQuery();
   const alunosQuery = trpc.alunos.listByTurma.useQuery(selectedTurmaId || 0, {
@@ -256,7 +258,6 @@ export default function NotasPage() {
                   if (turma && selectedTurmaId && alunosQuery.data) {
                     try {
                       // Buscar notas reais da turma
-                      const utils = trpc.useUtils();
                       const notasReais = await utils.notas.getByTurmaAndBimestre.fetch({
                         turmaId: selectedTurmaId,
                         bimestre: selectedBimestreExport,
