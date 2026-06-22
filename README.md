@@ -5,7 +5,7 @@ Um aplicativo web elegante e responsivo para gestão escolar de notas, otimizado
 **Versão:** 2.0.0  
 **Tecnologia:** React 19 + TypeScript + Express + tRPC + MySQL + jsPDF + Capacitor  
 **Status:** ✅ Produção  
-**Domínio:** https://escolaapp-x5ndie34.manus.space
+**Criador** Francisco Eduardo
 
 ---
 
@@ -442,16 +442,6 @@ pnpm drizzle-kit migrate   # Aplica migrations
 
 **Problema**: "Aplicação não instalada"  
 **Solução**: Habilite "Instalar de fontes desconhecidas" nas configurações do Android
-
----
-
-## 📞 Suporte
-
-Para dúvidas, bugs ou sugestões:
-
-1. Abra uma **Issue** no GitHub
-2. Envie um **Pull Request** com melhorias
-3. Entre em contato via email
 
 ---
 
