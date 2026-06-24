@@ -22,7 +22,7 @@ Existem **3 formas** de gerar o APK:
 
 **Windows/Mac/Linux:**
 - Node.js 22+
-- Java Development Kit (JDK) 11+
+- **Java Development Kit (JDK) 21** ⚠️ **IMPORTANTE: Java 21 é OBRIGATÓRIO**
 - Android SDK
 - Gradle 8.0+
 - Git
@@ -31,13 +31,30 @@ Existem **3 formas** de gerar o APK:
 
 ```bash
 # macOS (com Homebrew)
-brew install java gradle android-sdk
+brew install openjdk@21 gradle android-sdk
 
 # Ubuntu/Debian
-sudo apt-get install default-jdk gradle android-sdk
+sudo apt-get install openjdk-21-jdk gradle android-sdk
 
 # Windows (com Chocolatey)
-choco install openjdk gradle android-sdk
+choco install openjdk21 gradle android-sdk
+```
+
+**⚠️ Configurar JAVA_HOME para Java 21:**
+
+```bash
+# Linux/Mac
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64  # Ubuntu/Debian
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)     # macOS
+
+# Windows - Adicionar ao Path do Sistema
+C:\Program Files\Eclipse Temurin\jdk-21.0.x
+```
+
+**Verificar versão do Java:**
+```bash
+java -version
+# Deve retornar: openjdk version "21" ou similar
 ```
 
 ### Variáveis de Ambiente
@@ -484,7 +501,99 @@ jobs:
 
 ---
 
-## 📚 Recursos Adicionais
+## 🆘 Solução de Problemas (Troubleshooting)
+
+### ❌ Erro: "Android Gradle plugin requires Java 17 to run"
+
+**Problema:** Build falha com erro indicando versão de Java insuficiente.
+
+**Solução:**
+```bash
+# Instalar Java 21
+sudo apt-get install openjdk-21-jdk
+
+# Configurar JAVA_HOME
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+
+# Tentar novamente
+cd android && ./gradlew clean assembleDebug
+```
+
+---
+
+### ❌ Erro: "invalid source release: 21"
+
+**Problema:** Compilador Java é versão anterior a 21 (por ex: Java 11 ou 17).
+
+**Causa:** O arquivo `capacitor.build.gradle` (auto-gerado) requer Java 21.
+
+**Solução:**
+```bash
+# Verificar versão do Java
+java -version
+
+# Se não for 21, instalar Java 21:
+sudo apt-get install openjdk-21-jdk
+
+# Definir como padrão:
+sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-openjdk-amd64/bin/java 1
+sudo update-alternatives --config java
+
+# Ou passar na variável de ambiente:
+cd android
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 ./gradlew assembleDebug
+```
+
+---
+
+### ❌ Erro: "Android SDK location not found"
+
+**Solução:**
+```bash
+# Linux/Mac
+export ANDROID_SDK_ROOT=$HOME/Android/Sdk
+export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
+export PATH=$PATH:$ANDROID_SDK_ROOT/platform-tools
+
+# Windows
+setx ANDROID_SDK_ROOT "C:\Android\Sdk"
+```
+
+---
+
+### ❌ App não abre após instalar no Android
+
+**Possíveis causas e soluções:**
+
+1. **Assets não foram compilados:**
+   ```bash
+   cd /workspaces/escola-app-mobile
+   pnpm build
+   npx cap sync android
+   ```
+
+2. **Frontend não está em dist/public:**
+   ```bash
+   ls -la dist/public/index.html
+   # Se não existir, rodar pnpm build
+   ```
+
+3. **Limpar cache do Android:**
+   ```bash
+   cd android
+   ./gradlew clean
+   ./gradlew assembleDebug
+   ```
+
+4. **Verificar logs do app no dispositivo:**
+   ```bash
+   adb logcat | grep EscolaApp
+   ```
+
+---
+
+### 📚 Recursos Adicionais
+
 
 - [Capacitor Android Documentation](https://capacitorjs.com/docs/android)
 - [Android Developer Guide](https://developer.android.com/)
